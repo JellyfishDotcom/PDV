@@ -7,30 +7,34 @@ class Data_base:
             self.conn = mariadb.connect(user='root', password='saulh970625', port=3306, database="PDV")
             print('Conexion exitosa')
         except mariadb.Error as e:
-            print(f'Error connecting to MriaDB Platform: {e}')
-
-        self.cur = self.conn.cursor()
+            print(f'Error connecting to MariaDB Platform: {e}')
 
     def query_sql(self, command):
         try:
-            return self.cur.execute(command)
+            self.cur = self.conn.cursor()
+            aux = self.cur.execute(command)
+            return aux
         except mariadb.Error as e:
             print(f'Error {e}')
 
     def delete_sql(self, command):
         try:
+            self.cur = self.conn.cursor()
             self.cur.execute(command)
         except mariadb.Error as e:
             print(f'Error {e}')
 
     def modify_sql(self,command):
         try:
+            self.cur = self.conn.cursor()
             self.cur.execute(command)
+            self.conn.commit()
         except mariadb.Error as e:
             print(f'Error {e}')
 
     def insert_sql(self,command):
         try:
+            self.cur = self.conn.cursor()
             self.cur.execute(command)
         except mariadb.Error as e:
             print(f'Error {e}')

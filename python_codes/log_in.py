@@ -14,8 +14,8 @@ class Log_in(customtkinter.CTk):
     def __init__(self):
         super().__init__()
         self.db = Data_base()
-        customtkinter.set_appearance_mode(self._select_theme())
-        self._set_language(self._select_language())
+        customtkinter.set_appearance_mode(str(self._select_theme()))
+        self._set_language(str(self._select_language()))
         # configure window
         self.title(self.window_title_txt)
         self.geometry(f"{550}x{270}")
@@ -25,31 +25,23 @@ class Log_in(customtkinter.CTk):
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure((2, 3), weight=0)
         self.grid_rowconfigure((0, 1, 2), weight=1)
-
         self.init_comp()
 
     def _select_theme(self):
         self.db.query_sql(command='SELECT * from themes')
         themes = list()
-        for theme in self.db.cur:
+        for id_theme, theme in self.db.cur:
             themes.append(str(theme))
-        if themes[0] == "('Light',)":
-            return 'Light'
-        if themes[0] == "('Dark',)":
-            return 'Dark'
-        if themes[0] == "('System',)":
-            return 'System'
+        self.db.cur.close()
+        return themes[0]
 
     def _select_language(self):
         self.db.query_sql(command='SELECT * from languages')
         languages = list()
-        for language in self.db.cur:
+        for id_language, language in self.db.cur:
             languages.append(str(language))
-        print(languages)
-        if languages[0] == "('English',)":
-            return 'English'
-        if languages[0] == "('Spanish',)":
-            return 'Spanish'
+        self.db.cur.close()
+        return languages[0]
 
     def _set_language(self, language):
         if language == 'English':
@@ -69,7 +61,7 @@ class Log_in(customtkinter.CTk):
             self.user_txt = 'Usuario'
             self.password_txt = 'Contraseña'
             self.log_in_txt = 'Iniciar Sesión'
-            self.incorrect_title_txt = 'Usuario/contraseña incorrecto'
+            self.incorrect_title_txt = 'Usuario/contraseña incorrectos'
             self.incorrect_message_txt = 'El usuario que proporcionaste no existe o la contraseña es incorrecta.'
 
 
@@ -148,12 +140,14 @@ class Log_in(customtkinter.CTk):
             self.db.query_sql(command='SELECT user FROM users')
             for user in self.db.cur:
                 users.append(str(user))
+            self.db.cur.close()
             if str("('"+self.user_entry.get()+"',)") in users:
                 passwords = list()
                 try:
                     self.db.query_sql(command=str("SELECT password FROM users WHERE user='"+self.user_entry.get()+"'"))
                     for password in self.db.cur:
                         passwords.append(str(password))
+                    self.db.cur.close()
                     if str("('"+self.password_entry.get()+"',)") == passwords[0]:
                         self.withdraw()
                         self.main = Main(self)
